@@ -117,13 +117,14 @@ class TestConfigurationErrorHandling:
 class TestEnvKeyValidation:
     """Tests for environment-based API key validation."""
 
-    def test_llm_and_groq_conflict_raises(self, monkeypatch: Any) -> None:
+    def test_llm_and_groq_can_coexist(self, monkeypatch: Any) -> None:
+        """LLM_API_KEY and GROQ_API_KEY can now coexist for different services."""
         monkeypatch.setenv("LLM_API_KEY", "llm-value")
         monkeypatch.setenv("GROQ_API_KEY", "groq-value")
         monkeypatch.delenv("WHISPER_REMOTE_API_KEY", raising=False)
 
-        with pytest.raises(SystemExit):
-            app_module._validate_env_key_conflicts()
+        # Should not raise - these keys are for different purposes now
+        app_module._validate_env_key_conflicts()
 
     def test_whisper_remote_allows_different_key(self, monkeypatch: Any) -> None:
         monkeypatch.setenv("LLM_API_KEY", "llm-value")
