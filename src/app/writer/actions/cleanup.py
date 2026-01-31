@@ -107,8 +107,9 @@ def clear_post_processing_data_action(params: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def clear_ad_detection_action(params: Dict[str, Any]) -> Dict[str, Any]:
-    """Clear ad detection results (identifications and LLM model calls) for a post.
-    
+    """
+    Clear ad detection results (identifications and LLM model calls) for a post.
+
     Preserves transcription data and whisper model calls.
     """
     post_id = params.get("post_id")
@@ -163,8 +164,9 @@ def clear_ad_detection_action(params: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def clear_audio_processing_action(params: Dict[str, Any]) -> Dict[str, Any]:
-    """Clear processed audio for a post, allowing re-processing of audio cuts.
-    
+    """
+    Clear processed audio for a post, allowing re-processing of audio cuts.
+
     Preserves transcription and ad detection results.
     """
     post_id = params.get("post_id")
