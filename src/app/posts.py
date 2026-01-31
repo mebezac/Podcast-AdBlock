@@ -163,5 +163,61 @@ def clear_post_processing_data(post: Post) -> None:
         raise PostException(f"Failed to clear processing data: {str(e)}") from e
 
 
+def clear_ad_detection_data(post: Post) -> None:
+    """
+    Clear ad detection results for a post, preserving transcription data.
+    This allows retrying just the ad detection step without re-transcribing.
+    """
+    try:
+        logger.info(
+            f"Clearing ad detection data for post: {post.title} (ID: {post.id})"
+        )
+
+        result = writer_client.action(
+            "clear_ad_detection", {"post_id": post.id}, wait=True
+        )
+
+        logger.info(
+            f"Successfully cleared ad detection data for post: {post.title} (ID: {post.id})"
+        )
+
+        return result.data if result else None
+
+    except Exception as e:
+        logger.error(
+            f"Error clearing ad detection data for post {post.id}: {e}",
+            exc_info=True,
+        )
+        raise PostException(f"Failed to clear ad detection data: {str(e)}") from e
+
+
+def clear_audio_processing_data(post: Post) -> None:
+    """
+    Clear processed audio for a post, preserving transcription and ad detection.
+    This allows retrying just the audio processing step without re-transcribing or re-detecting.
+    """
+    try:
+        logger.info(
+            f"Clearing audio processing data for post: {post.title} (ID: {post.id})"
+        )
+
+        result = writer_client.action(
+            "clear_audio_processing", {"post_id": post.id}, wait=True
+        )
+
+        logger.info(
+            f"Successfully cleared audio processing data for post: {post.title} (ID: {post.id})"
+        )
+
+        return result.data if result else None
+
+    except Exception as e:
+        logger.error(
+            f"Error clearing audio processing data for post {post.id}: {e}",
+            exc_info=True,
+        )
+        raise PostException(f"Failed to clear audio processing data: {str(e)}") from e
+
+
 class PostException(Exception):
     pass

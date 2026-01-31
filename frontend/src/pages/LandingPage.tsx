@@ -28,9 +28,9 @@ export default function LandingPage() {
                 How it works
               </a>
               <a
-                href="https://github.com/podly-pure-podcasts/podly-pure-podcasts"
+                href="https://github.com/mebezac/Podcast-AdBlock"
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
               >
                 GitHub
@@ -182,7 +182,7 @@ export default function LandingPage() {
             </p>
             <div className="flex items-center gap-4">
               <a
-                href="https://github.com/podly-pure-podcasts/podly-pure-podcasts"
+                href="https://github.com/mebezac/Podcast-AdBlock"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-400 hover:text-gray-600 transition-colors"
@@ -192,7 +192,7 @@ export default function LandingPage() {
                 </svg>
               </a>
               <a
-                href="https://discord.gg/FRB98GtF6N"
+                href="https://github.com/mebezac/Podcast-AdBlock"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-400 hover:text-gray-600 transition-colors"

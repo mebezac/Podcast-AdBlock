@@ -15,7 +15,7 @@ Paste one of the prompts below into the chat box.
 If you don't have the repo downloaded:
 
 ```
-Help me install docker and run Podly https://github.com/podly-pure-podcasts/podly_pure_podcasts
+Help me install docker and run Podcast-AdBlock https://github.com/mebezac/Podcast-AdBlock
 After the project is cloned, help me:
 - install docker & docker compose
 - run `./run_podly_docker.sh --build` then `./run_podly_docker.sh -d`
@@ -103,8 +103,8 @@ You should see version information for both commands.
 ### Download the Project
 
 ```bash
-git clone https://github.com/normand1/podly_pure_podcasts.git
-cd podly_pure_podcasts
+git clone https://github.com/mebezac/Podcast-AdBlock.git
+cd Podcast-AdBlock
 ```
 
 ## Running Podly
@@ -225,8 +225,8 @@ In both cases this output should appear to indicate that it has stopped:
 
 ```sh
 [+] Running 2/2
- ✔ Container podly-pure-podcasts        Removed
- ✔ Network podly-pure-podcasts-network  Removed
+ ✔ Container podcast-adblock              Removed
+ ✔ Network podcast-adblock-network        Removed
 ```
 
 ## Upgrading Podly

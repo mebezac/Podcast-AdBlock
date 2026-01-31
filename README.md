@@ -6,6 +6,9 @@
 <p align="center">
 <p align="center">Ad-block for podcasts. Create an ad-free RSS feed.</p>
 <p align="center">
+  <a href="https://github.com/mebezac/Podcast-AdBlock" target="_blank">
+    <img src="https://img.shields.io/badge/GitHub-Repo-blue.svg?logo=github&logoColor=white" alt="GitHub">
+  </a>
   <a href="https://discord.gg/FRB98GtF6N" target="_blank">
       <img src="https://img.shields.io/badge/discord-join-blue.svg?logo=discord&logoColor=white" alt="Discord">
   </a>
@@ -13,7 +16,11 @@
 
 ## Overview
 
-Podly uses Whisper and Chat GPT to remove ads from podcasts.
+Podcast-AdBlock (a fork of Podly) uses Whisper and LLMs to remove ads from podcasts.
+
+**This is a fork of [normand1/podly_pure_podcasts](https://github.com/normand1/podly_pure_podcasts) with additional features and improvements.**
+
+🔗 **Main Repository**: https://github.com/mebezac/Podcast-AdBlock
 
 <img width="100%" src="docs/images/screenshot.png" />
 
@@ -55,5 +62,14 @@ You have a few options to get started:
 
 
 ## Contributing
+
+**Important**: This is a fork maintained at https://github.com/mebezac/Podcast-AdBlock
+
+All contributions (pushes, pull requests, issues) should be made to **this fork**, not the original upstream repository.
+
+- 🐛 **Bug Reports**: [Open an issue](https://github.com/mebezac/Podcast-AdBlock/issues)
+- 🚀 **Feature Requests**: [Open an issue](https://github.com/mebezac/Podcast-AdBlock/issues)
+- 💻 **Pull Requests**: Submit PRs to the `main` branch of this fork
+- 📖 **Documentation**: See [contributing guide](docs/contributors.md) for local setup & contribution instructions
 
 See [contributing guide](docs/contributors.md) for local setup & contribution instructions.

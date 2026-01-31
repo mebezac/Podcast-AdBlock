@@ -237,24 +237,10 @@ def _validate_env_key_conflicts() -> None:
     Rules:
     - If both LLM_API_KEY and GROQ_API_KEY are set and differ -> error
     """
-    llm_key = os.environ.get("LLM_API_KEY")
-    groq_key = os.environ.get("GROQ_API_KEY")
-
-    conflicts: list[str] = []
-    if llm_key and groq_key and llm_key != groq_key:
-        conflicts.append(
-            "LLM_API_KEY and GROQ_API_KEY are both set but have different values"
-        )
-
-    if conflicts:
-        details = "; ".join(conflicts)
-        message = (
-            "Configuration error: Conflicting environment API keys detected. "
-            f"{details}. To use Groq, prefer setting GROQ_API_KEY only; "
-            "alternatively, set the variables to the same value."
-        )
-        # Crash the process so Docker start fails clearly
-        raise SystemExit(message)
+    # Previously this function prevented having different API keys for whisper and LLM.
+    # Now we allow separate keys: GROQ_API_KEY for whisper, LLM_API_KEY for ad detection.
+    # LLM_API_KEY can work with any provider (OpenAI, Groq, Anthropic, etc.) via openai_base_url.
+    pass
 
 
 def _create_flask_app() -> Flask:

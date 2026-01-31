@@ -21,4 +21,4 @@ services:
 
 networks:
   default:
-    name: podly-pure-podcasts-network
+    name: podcast-adblock-network
