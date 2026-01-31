@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from typing import List, Optional
+from typing import Any, List, Optional
 
 from app.models import Post
 from app.writer.client import writer_client
@@ -163,7 +163,7 @@ def clear_post_processing_data(post: Post) -> None:
         raise PostException(f"Failed to clear processing data: {str(e)}") from e
 
 
-def clear_ad_detection_data(post: Post) -> dict | None:
+def clear_ad_detection_data(post: Post) -> dict[str, Any] | None:
     """
     Clear ad detection results for a post, preserving transcription.
     This allows retrying ad detection without re-transcribing.
@@ -191,7 +191,7 @@ def clear_ad_detection_data(post: Post) -> dict | None:
         raise PostException(f"Failed to clear ad detection data: {str(e)}") from e
 
 
-def clear_audio_processing_data(post: Post) -> dict | None:
+def clear_audio_processing_data(post: Post) -> dict[str, Any] | None:
     """
     Clear processed audio for a post, preserving transcription and ad detection.
     This allows retrying just the audio processing step without re-transcribing or re-detecting.
