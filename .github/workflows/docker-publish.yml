@@ -13,45 +13,7 @@ env:
   IMAGE_NAME: ${{ github.repository_owner }}/podcast-adblock
 
 jobs:
-  changes:
-    runs-on: ubuntu-latest
-    outputs:
-      skip: ${{ steps.check_files.outputs.skip }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Check for documentation-only changes
-        id: check_files
-        run: |
-          echo "Release event detected; building images for release tag"
-          TARGET_REF="${{ github.event.release.target_commitish }}"
-          echo "Fetching release target origin/$TARGET_REF"
-          git fetch --no-tags origin "$TARGET_REF" || true
-          HEAD_SHA=$(git rev-parse "${{ github.sha }}")
-          BASE_SHA=$(git rev-parse "origin/$TARGET_REF" 2>/dev/null || git rev-parse "$TARGET_REF" 2>/dev/null || echo "$HEAD_SHA")
-          files_changed=$(git diff --name-only "$BASE_SHA"..."$HEAD_SHA" 2>/dev/null || echo "release-trigger")
-
-          echo "Files changed:"
-          echo "$files_changed"
-
-          # If no files are documentation, then we should continue
-          non_doc_files=$(echo "$files_changed" | grep -v -E '(\.md$|^docs/|LICENCE)')
-
-          if [ -z "$non_doc_files" ]; then
-            echo "Only documentation files were changed. Skipping build and publish."
-            echo "skip=true" >> $GITHUB_OUTPUT
-          else
-            echo "Code files were changed. Proceeding with build and publish."
-            echo "skip=false" >> $GITHUB_OUTPUT
-          fi
-        shell: bash
-
   build-amd64:
-    needs: changes
-    if: ${{ needs.changes.outputs.skip == 'false' }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
