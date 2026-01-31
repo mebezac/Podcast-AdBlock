@@ -1,7 +1,7 @@
 services:
-  podly:
-    container_name: podly-pure-podcasts
-    image: podly-pure-podcasts
+  podcast-adblock:
+    container_name: podcast-adblock
+    image: podcast-adblock
     volumes:
       - ./src/instance:/app/src/instance
     env_file:
@@ -39,4 +39,4 @@ services:
 
 networks:
   default:
-    name: podly-pure-podcasts-network
+    name: podcast-adblock-network

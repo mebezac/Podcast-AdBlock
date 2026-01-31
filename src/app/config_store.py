@@ -171,11 +171,9 @@ def _apply_llm_env_overrides_to_db(llm: Any) -> bool:
     """
     changed = False
 
-    env_llm_key = (
-        os.environ.get("LLM_API_KEY")
-        or os.environ.get("OPENAI_API_KEY")
-        or os.environ.get("GROQ_API_KEY")
-    )
+    # LLM_API_KEY is now exclusively for ad detection/LLM calls
+    # It can work with any provider (OpenAI, Groq, Anthropic, etc.) via openai_base_url
+    env_llm_key = os.environ.get("LLM_API_KEY") or os.environ.get("OPENAI_API_KEY")
     changed = _set_if_empty(llm, "llm_api_key", env_llm_key) or changed
 
     env_llm_model = os.environ.get("LLM_MODEL")
@@ -834,11 +832,9 @@ def _log_initial_snapshot(cfg: PydanticConfig) -> None:
 
 
 def _apply_top_level_env_overrides(cfg: PydanticConfig) -> None:
-    env_llm_key = (
-        os.environ.get("LLM_API_KEY")
-        or os.environ.get("OPENAI_API_KEY")
-        or os.environ.get("GROQ_API_KEY")
-    )
+    # LLM_API_KEY is now exclusively for ad detection/LLM calls
+    # It can work with any provider (OpenAI, Groq, Anthropic, etc.) via openai_base_url
+    env_llm_key = os.environ.get("LLM_API_KEY") or os.environ.get("OPENAI_API_KEY")
     if env_llm_key:
         cfg.llm_api_key = env_llm_key
 
@@ -1165,11 +1161,9 @@ def _apply_llm_env_overrides(llm: LLMSettings) -> bool:
     """Apply environment overrides to LLM settings."""
     changed = False
 
-    env_llm_key = (
-        os.environ.get("LLM_API_KEY")
-        or os.environ.get("OPENAI_API_KEY")
-        or os.environ.get("GROQ_API_KEY")
-    )
+    # LLM_API_KEY is now exclusively for ad detection/LLM calls
+    # It can work with any provider (OpenAI, Groq, Anthropic, etc.) via openai_base_url
+    env_llm_key = os.environ.get("LLM_API_KEY") or os.environ.get("OPENAI_API_KEY")
     if env_llm_key:
         llm.llm_api_key = env_llm_key
         changed = True

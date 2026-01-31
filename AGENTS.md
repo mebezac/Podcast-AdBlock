@@ -1,3 +1,9 @@
+Project: Podcast-AdBlock (a fork of Podly)
+Repository: https://github.com/mebezac/Podcast-AdBlock
+
+**This is a fork of normand1/podly_pure_podcasts**
+All development work should target this fork, not the upstream repository.
+
 Project-specific rules:
 - Do not create Alembic migrations yourself; request the user to generate migrations after model changes.
 - Only use ./scripts/ci.sh to run tests & lints - do not attempt to run directly

@@ -1,3 +1,4 @@
+# pylint: disable=too-many-lines
 import logging
 import math
 import os
@@ -19,7 +20,11 @@ from app.models import (
     Post,
     TranscriptSegment,
 )
-from app.posts import clear_post_processing_data
+from app.posts import (
+    clear_ad_detection_data,
+    clear_audio_processing_data,
+    clear_post_processing_data,
+)
 from app.routes.post_stats_utils import (
     count_model_calls,
     is_mixed_segment,
@@ -968,3 +973,111 @@ def download_post_legacy(p_guid: str) -> flask.Response:
 @post_bp.route("/post/<string:p_guid>/original.mp3", methods=["GET"])
 def download_original_post_legacy(p_guid: str) -> flask.Response:
     return api_download_original_post(p_guid)
+
+
+@post_bp.route("/api/posts/<string:p_guid>/clear-ads", methods=["POST"])
+def api_clear_ad_detection(p_guid: str) -> ResponseReturnValue:
+    """Clear ad detection results for a post (admins only).
+
+    This removes identifications and LLM model calls while preserving transcription.
+    The next processing run will re-run ad detection only.
+    """
+    logger.info("[API] Clear ad detection requested for post_guid=%s", p_guid)
+
+    post = Post.query.filter_by(guid=p_guid).first()
+    if not post:
+        return (
+            flask.jsonify(
+                {
+                    "status": "error",
+                    "error_code": "NOT_FOUND",
+                    "message": "Post not found",
+                }
+            ),
+            404,
+        )
+
+    _, error = require_admin("clear ad detection")
+    if error:
+        return error
+
+    try:
+        result = clear_ad_detection_data(post)
+        logger.info(
+            "[API] Clear ad detection completed for post_guid=%s",
+            p_guid,
+        )
+        return flask.jsonify(
+            {
+                "status": "success",
+                "message": "Ad detection data cleared successfully",
+                "details": result,
+            }
+        )
+    except Exception as e:
+        logger.error(f"Failed to clear ad detection for {p_guid}: {e}", exc_info=True)
+        return (
+            flask.jsonify(
+                {
+                    "status": "error",
+                    "error_code": "CLEAR_ADS_FAILED",
+                    "message": f"Failed to clear ad detection: {str(e)}",
+                }
+            ),
+            500,
+        )
+
+
+@post_bp.route("/api/posts/<string:p_guid>/clear-audio", methods=["POST"])
+def api_clear_audio_processing(p_guid: str) -> ResponseReturnValue:
+    """Clear processed audio for a post (admins only).
+
+    This removes the processed audio file while preserving transcription and ad detection.
+    The next processing run will re-run audio processing only.
+    """
+    logger.info("[API] Clear audio processing requested for post_guid=%s", p_guid)
+
+    post = Post.query.filter_by(guid=p_guid).first()
+    if not post:
+        return (
+            flask.jsonify(
+                {
+                    "status": "error",
+                    "error_code": "NOT_FOUND",
+                    "message": "Post not found",
+                }
+            ),
+            404,
+        )
+
+    _, error = require_admin("clear audio processing")
+    if error:
+        return error
+
+    try:
+        result = clear_audio_processing_data(post)
+        logger.info(
+            "[API] Clear audio processing completed for post_guid=%s",
+            p_guid,
+        )
+        return flask.jsonify(
+            {
+                "status": "success",
+                "message": "Processed audio cleared successfully",
+                "details": result,
+            }
+        )
+    except Exception as e:
+        logger.error(
+            f"Failed to clear audio processing for {p_guid}: {e}", exc_info=True
+        )
+        return (
+            flask.jsonify(
+                {
+                    "status": "error",
+                    "error_code": "CLEAR_AUDIO_FAILED",
+                    "message": f"Failed to clear audio processing: {str(e)}",
+                }
+            ),
+            500,
+        )

@@ -11,8 +11,8 @@
 
 ```bash
 # Clone repository
-git clone https://github.com/normand1/podly_pure_podcasts.git
-cd podly_pure_podcasts
+git clone https://github.com/mebezac/Podcast-AdBlock.git
+cd Podcast-AdBlock
 
 # Make script executable
 chmod +x run_podly_docker.sh

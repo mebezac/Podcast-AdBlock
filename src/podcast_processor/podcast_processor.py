@@ -329,28 +329,123 @@ class PodcastProcessor:
     ) -> None:
         """
         Perform the main processing steps: transcription, ad classification, and audio processing.
+        Skips steps that are already complete based on existing data.
 
         Args:
             post: The Post object to process
             job: The ProcessingJob for tracking
             processed_audio_path: Path where the processed audio will be saved
+            cancel_callback: Optional callback to check for cancellation
         """
-        # Step 2: Transcribe audio
+        # Step 2: Transcribe audio (if needed)
+        transcript_segments = self._get_or_create_transcription(
+            post, job, cancel_callback
+        )
+        if transcript_segments is None:
+            return  # Transcription was cancelled or failed
+
+        # Step 3: Classify ad segments (if needed)
+        ads_identified = self._classify_ad_segments_if_needed(
+            post, job, transcript_segments, cancel_callback
+        )
+        if not ads_identified:
+            return  # Ad detection was cancelled or failed
+
+        # Step 4: Process audio (if needed)
+        self._process_audio_if_needed(post, job, processed_audio_path, cancel_callback)
+
+    def _get_or_create_transcription(
+        self,
+        post: Post,
+        job: ProcessingJob,
+        cancel_callback: Optional[Callable[[], bool]] = None,
+    ) -> Optional[List[TranscriptSegment]]:
+        """Get existing transcription or create a new one. Returns None if cancelled."""
         self.status_manager.update_job_status(
             job, "running", 2, "Transcribing audio", 50.0
         )
         transcript_segments = self.transcription_manager.transcribe(post)
         self._raise_if_cancelled(job, 2, cancel_callback)
+        return transcript_segments
 
-        # Step 3: Classify ad segments
-        self._classify_ad_segments(post, job, transcript_segments)
+    def _classify_ad_segments_if_needed(
+        self,
+        post: Post,
+        job: ProcessingJob,
+        transcript_segments: List[TranscriptSegment],
+        cancel_callback: Optional[Callable[[], bool]] = None,
+    ) -> bool:
+        """Classify ad segments if not already done. Returns False if cancelled."""
+        # Check if we already have ad detection results
+        if self._has_existing_ad_detection(post):
+            self.logger.info(
+                f"Ad detection already complete for post {post.id}. Skipping classification."
+            )
+            self.status_manager.update_job_status(
+                job, "running", 3, "Ad detection already complete", 75.0
+            )
+        else:
+            self._classify_ad_segments(post, job, transcript_segments)
+
         self._raise_if_cancelled(job, 3, cancel_callback)
+        return True
 
-        # Step 4: Process audio (remove ad segments)
-        self.status_manager.update_job_status(
-            job, "running", 4, "Processing audio", 90.0
+    def _has_existing_ad_detection(self, post: Post) -> bool:
+        """Check if ad detection has already been performed for this post."""
+        # Check for successful LLM model calls for this post (excluding whisper calls)
+        from app.models import ModelCall
+
+        existing_llm_call = (
+            self.db_session.query(ModelCall)
+            .filter_by(post_id=post.id, status="success")
+            .filter(~ModelCall.model_name.like("%whisper%"))
+            .first()
         )
-        self.audio_processor.process_audio(post, processed_audio_path)
+
+        if not existing_llm_call:
+            return False
+
+        # Also verify there are identifications in the database
+        from app.models import Identification
+
+        segment_ids = [
+            row[0]
+            for row in self.db_session.query(TranscriptSegment.id)
+            .filter_by(post_id=post.id)
+            .all()
+        ]
+        if not segment_ids:
+            return False
+
+        has_identifications = (
+            self.db_session.query(Identification)
+            .filter(Identification.transcript_segment_id.in_(segment_ids))
+            .first()
+        ) is not None
+
+        return has_identifications
+
+    def _process_audio_if_needed(
+        self,
+        post: Post,
+        job: ProcessingJob,
+        processed_audio_path: str,
+        cancel_callback: Optional[Callable[[], bool]] = None,
+    ) -> None:
+        """Process audio if not already done."""
+        # Check if processed audio already exists
+        if os.path.exists(processed_audio_path):
+            self.logger.info(
+                f"Processed audio already exists at {processed_audio_path}. Skipping audio processing."
+            )
+            self.status_manager.update_job_status(
+                job, "running", 4, "Processed audio already exists", 100.0
+            )
+        else:
+            self.status_manager.update_job_status(
+                job, "running", 4, "Processing audio", 90.0
+            )
+            self.audio_processor.process_audio(post, processed_audio_path)
 
         # Update the database with the processed audio path
         self._remove_unprocessed_audio(post)

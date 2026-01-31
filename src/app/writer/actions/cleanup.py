@@ -106,6 +106,107 @@ def clear_post_processing_data_action(params: Dict[str, Any]) -> Dict[str, Any]:
     return {"post_id": post.id}
 
 
+def clear_ad_detection_action(params: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Clear ad detection results (identifications and LLM model calls) for a post.
+
+    Preserves transcription data and whisper model calls.
+    """
+    post_id = params.get("post_id")
+    post = db.session.get(Post, post_id)
+    if not post:
+        raise ValueError(f"Post {post_id} not found")
+
+    logger.info("[WRITER] clear_ad_detection_action: post_id=%s", post_id)
+
+    # Get transcript segment IDs for this post
+    segment_ids = [
+        row[0]
+        for row in db.session.query(TranscriptSegment.id)
+        .filter_by(post_id=post.id)
+        .all()
+    ]
+
+    # Delete identifications for these segments
+    if segment_ids:
+        idents_deleted = (
+            db.session.query(Identification)
+            .filter(Identification.transcript_segment_id.in_(segment_ids))
+            .delete(synchronize_session=False)
+        )
+    else:
+        idents_deleted = 0
+
+    # Delete non-whisper model calls (ad detection uses LLM, not whisper)
+    llm_calls_deleted = (
+        db.session.query(ModelCall)
+        .filter_by(post_id=post.id)
+        .filter(~ModelCall.model_name.like("%whisper%"))
+        .delete(synchronize_session=False)
+    )
+
+    # Reset refined ad boundaries since they depend on ad detection
+    post.refined_ad_boundaries = None
+    post.refined_ad_boundaries_updated_at = None
+
+    logger.info(
+        "[WRITER] clear_ad_detection_action: post_id=%s idents_deleted=%s llm_calls_deleted=%s",
+        post_id,
+        idents_deleted,
+        llm_calls_deleted,
+    )
+
+    return {
+        "post_id": post.id,
+        "identifications_deleted": idents_deleted,
+        "llm_calls_deleted": llm_calls_deleted,
+    }
+
+
+def clear_audio_processing_action(params: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Clear processed audio for a post, allowing re-processing of audio cuts.
+
+    Preserves transcription and ad detection results.
+    """
+    post_id = params.get("post_id")
+    post = db.session.get(Post, post_id)
+    if not post:
+        raise ValueError(f"Post {post_id} not found")
+
+    logger.info("[WRITER] clear_audio_processing_action: post_id=%s", post_id)
+
+    # Track if file was removed
+    file_removed = False
+
+    # Remove processed audio file if it exists
+    if post.processed_audio_path and os.path.exists(post.processed_audio_path):
+        try:
+            os.remove(post.processed_audio_path)
+            file_removed = True
+            logger.info(
+                "[WRITER] clear_audio_processing_action: removed processed audio file=%s",
+                post.processed_audio_path,
+            )
+        except OSError as e:
+            logger.error(
+                "[WRITER] clear_audio_processing_action: failed to remove file=%s error=%s",
+                post.processed_audio_path,
+                e,
+            )
+
+    # Reset the processed audio path
+    post.processed_audio_path = None
+
+    logger.info(
+        "[WRITER] clear_audio_processing_action: completed post_id=%s file_removed=%s",
+        post_id,
+        file_removed,
+    )
+
+    return {"post_id": post.id, "file_removed": file_removed}
+
+
 def cleanup_processed_post_action(params: Dict[str, Any]) -> Dict[str, Any]:
     post_id = params.get("post_id")
     if not post_id:

@@ -34,17 +34,10 @@ Run on your own server with Docker Compose.
 **Setup:**
 ```bash
 # Clone repository
-git clone https://github.com/normand1/podly_pure_podcasts.git
-cd podly_pure_podcasts
+git clone https://github.com/mebezac/Podcast-AdBlock.git
+cd Podcast-AdBlock
 
 # Configure
-cp .env.local.example .env.local
-nano .env.local  # Add your API keys
-
-# Start
-chmod +x run_podly_docker.sh
-./run_podly_docker.sh --build
-./run_podly_docker.sh -d
 ```
 
 **Reverse Proxy (Nginx):**
@@ -84,8 +77,8 @@ sudo apt update
 sudo apt install python3-pip ffmpeg nodejs npm
 
 # Clone and setup
-git clone https://github.com/normand1/podly_pure_podcasts.git
-cd podly_pure_podcasts
+git clone https://github.com/mebezac/Podcast-AdBlock.git
+cd Podcast-AdBlock
 
 # Python setup
 python3 -m venv .venv

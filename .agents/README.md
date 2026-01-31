@@ -1,8 +1,14 @@
-# README - Podly Documentation
+# README - Podcast-AdBlock Documentation
 
-## Welcome to the Podly Documentation
+## Welcome to the Podcast-AdBlock Documentation
 
-This `.agents` folder contains comprehensive documentation for the **Podly** podcast ad-blocking application. The documentation is organized into focused sections for easy reference.
+This `.agents` folder contains comprehensive documentation for the **Podcast-AdBlock** podcast ad-blocking application. Podcast-AdBlock is a fork of [Podly](https://github.com/normand1/podly_pure_podcasts) with additional features and improvements.
+
+**Main Repository**: https://github.com/mebezac/Podcast-AdBlock
+
+⚠️ **Important**: All development work should target this fork, not the upstream repository. Please submit issues and pull requests to https://github.com/mebezac/Podcast-AdBlock.
+
+This documentation is organized into focused sections for easy reference.
 
 ## Documentation Index
 
@@ -93,6 +99,7 @@ See [08_configuration.md](08_configuration.md) for configuration details.
 
 ## External Documentation
 
+- Main Repository: https://github.com/mebezac/Podcast-AdBlock
 - Main README: `/workspace/repos/Podcast-AdBlock/README.md`
 - Railway Guide: `docs/how_to_run_railway.md`
 - Beginner's Guide: `docs/how_to_run_beginners.md`
@@ -100,10 +107,10 @@ See [08_configuration.md](08_configuration.md) for configuration details.
 
 ## Support
 
+- **GitHub Issues**: https://github.com/mebezac/Podcast-AdBlock/issues (Report bugs and feature requests here)
 - **Discord**: https://discord.gg/FRB98GtF6N
-- **Issues**: GitHub Issues (in main repo)
 - **Preview Server**: https://podly.up.railway.app/
 
 ---
 
-*This documentation is maintained as part of the Podly project. Last updated: 2025-01-31*
+*This documentation is maintained as part of the Podcast-AdBlock project. Last updated: 2025-01-31*

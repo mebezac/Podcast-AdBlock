@@ -15,7 +15,7 @@ permissions:
   
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository_owner }}/podly-pure-podcasts
+  IMAGE_NAME: ${{ github.repository_owner }}/podcast-adblock
 
 jobs:
   changes:
@@ -116,13 +116,6 @@ jobs:
           driver-opts: |
             image=moby/buildkit:v0.12.0
 
-      - name: Log in to Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Extract metadata
         id: meta
         uses: docker/metadata-action@v5
@@ -134,12 +127,12 @@ jobs:
             type=semver,pattern={{version}},suffix=-${{ matrix.variant.name }}-${{ env.ARCH }}
             type=raw,value=${{ matrix.variant.name }}-${{ env.ARCH }},enable={{is_default_branch}}
 
-      - name: Build and push
+      - name: Build (no push for PRs)
         uses: docker/build-push-action@v5
         with:
           context: .
           file: ./Dockerfile
-          push: true
+          push: false
           platforms: linux/${{ env.ARCH }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -367,7 +360,9 @@ jobs:
             type=ref,event=branch,suffix=-${{ matrix.variant }}
             type=ref,event=pr,suffix=-${{ matrix.variant }}
             type=semver,pattern={{version}},suffix=-${{ matrix.variant }}
+            type=semver,pattern={{version}},enable=${{ matrix.variant == 'latest' }}
             type=raw,value=${{ matrix.variant }},enable={{is_default_branch}}
+            type=raw,value=latest,enable={{is_default_branch}},enable=${{ matrix.variant == 'latest' }}
 
       - name: Create and push manifest
         run: |
