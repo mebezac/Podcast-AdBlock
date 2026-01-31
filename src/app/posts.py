@@ -163,10 +163,10 @@ def clear_post_processing_data(post: Post) -> None:
         raise PostException(f"Failed to clear processing data: {str(e)}") from e
 
 
-def clear_ad_detection_data(post: Post) -> None:
+def clear_ad_detection_data(post: Post) -> dict | None:
     """
-    Clear ad detection results for a post, preserving transcription data.
-    This allows retrying just the ad detection step without re-transcribing.
+    Clear ad detection results for a post, preserving transcription.
+    This allows retrying ad detection without re-transcribing.
     """
     try:
         logger.info(
@@ -191,7 +191,7 @@ def clear_ad_detection_data(post: Post) -> None:
         raise PostException(f"Failed to clear ad detection data: {str(e)}") from e
 
 
-def clear_audio_processing_data(post: Post) -> None:
+def clear_audio_processing_data(post: Post) -> dict | None:
     """
     Clear processed audio for a post, preserving transcription and ad detection.
     This allows retrying just the audio processing step without re-transcribing or re-detecting.
