@@ -240,7 +240,6 @@ def _validate_env_key_conflicts() -> None:
     # Previously this function prevented having different API keys for whisper and LLM.
     # Now we allow separate keys: GROQ_API_KEY for whisper, LLM_API_KEY for ad detection.
     # LLM_API_KEY can work with any provider (OpenAI, Groq, Anthropic, etc.) via openai_base_url.
-    pass
 
 
 def _create_flask_app() -> Flask:

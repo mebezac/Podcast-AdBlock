@@ -338,7 +338,9 @@ class PodcastProcessor:
             cancel_callback: Optional callback to check for cancellation
         """
         # Step 2: Transcribe audio (if needed)
-        transcript_segments = self._get_or_create_transcription(post, job, cancel_callback)
+        transcript_segments = self._get_or_create_transcription(
+            post, job, cancel_callback
+        )
         if transcript_segments is None:
             return  # Transcription was cancelled or failed
 
@@ -350,9 +352,7 @@ class PodcastProcessor:
             return  # Ad detection was cancelled or failed
 
         # Step 4: Process audio (if needed)
-        self._process_audio_if_needed(
-            post, job, processed_audio_path, cancel_callback
-        )
+        self._process_audio_if_needed(post, job, processed_audio_path, cancel_callback)
 
     def _get_or_create_transcription(
         self,
@@ -386,7 +386,7 @@ class PodcastProcessor:
             )
         else:
             self._classify_ad_segments(post, job, transcript_segments)
-        
+
         self._raise_if_cancelled(job, 3, cancel_callback)
         return True
 
@@ -394,34 +394,35 @@ class PodcastProcessor:
         """Check if ad detection has already been performed for this post."""
         # Check for successful LLM model calls for this post (excluding whisper calls)
         from app.models import ModelCall
+
         existing_llm_call = (
             self.db_session.query(ModelCall)
             .filter_by(post_id=post.id, status="success")
             .filter(~ModelCall.model_name.like("%whisper%"))
             .first()
         )
-        
+
         if not existing_llm_call:
             return False
-        
+
         # Also verify there are identifications in the database
-        from app.models import Identification, TranscriptSegment
+        from app.models import Identification
+
         segment_ids = [
-            row[0] for row in 
-            self.db_session.query(TranscriptSegment.id)
+            row[0]
+            for row in self.db_session.query(TranscriptSegment.id)
             .filter_by(post_id=post.id)
             .all()
         ]
-        
         if not segment_ids:
             return False
-        
+
         has_identifications = (
             self.db_session.query(Identification)
             .filter(Identification.transcript_segment_id.in_(segment_ids))
             .first()
         ) is not None
-        
+
         return has_identifications
 
     def _process_audio_if_needed(

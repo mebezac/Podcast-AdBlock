@@ -977,7 +977,7 @@ def download_original_post_legacy(p_guid: str) -> flask.Response:
 @post_bp.route("/api/posts/<string:p_guid>/clear-ads", methods=["POST"])
 def api_clear_ad_detection(p_guid: str) -> ResponseReturnValue:
     """Clear ad detection results for a post (admins only).
-    
+
     This removes identifications and LLM model calls while preserving transcription.
     The next processing run will re-run ad detection only.
     """
@@ -996,7 +996,7 @@ def api_clear_ad_detection(p_guid: str) -> ResponseReturnValue:
             404,
         )
 
-    user, error = require_admin("clear ad detection")
+    _, error = require_admin("clear ad detection")
     if error:
         return error
 
@@ -1030,7 +1030,7 @@ def api_clear_ad_detection(p_guid: str) -> ResponseReturnValue:
 @post_bp.route("/api/posts/<string:p_guid>/clear-audio", methods=["POST"])
 def api_clear_audio_processing(p_guid: str) -> ResponseReturnValue:
     """Clear processed audio for a post (admins only).
-    
+
     This removes the processed audio file while preserving transcription and ad detection.
     The next processing run will re-run audio processing only.
     """
@@ -1049,7 +1049,7 @@ def api_clear_audio_processing(p_guid: str) -> ResponseReturnValue:
             404,
         )
 
-    user, error = require_admin("clear audio processing")
+    _, error = require_admin("clear audio processing")
     if error:
         return error
 
@@ -1067,7 +1067,9 @@ def api_clear_audio_processing(p_guid: str) -> ResponseReturnValue:
             }
         )
     except Exception as e:
-        logger.error(f"Failed to clear audio processing for {p_guid}: {e}", exc_info=True)
+        logger.error(
+            f"Failed to clear audio processing for {p_guid}: {e}", exc_info=True
+        )
         return (
             flask.jsonify(
                 {
