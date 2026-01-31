@@ -1,0 +1,207 @@
+# Authentication & Authorization System
+
+## Overview
+
+Podly has a flexible authentication system that can be enabled or disabled based on deployment needs.
+
+## Authentication Modes
+
+### 1. No Authentication (`REQUIRE_AUTH=false`)
+- All features accessible without login
+- Suitable for personal/single-user instances
+- No user management overhead
+- RSS feeds accessible by URL only
+
+### 2. With Authentication (`REQUIRE_AUTH=true`)
+- Login required for web UI and API
+- User role system (admin/user)
+- Feed access tokens for podcast players
+- Discord SSO support
+- Stripe billing integration
+
+## Components
+
+### AuthSettings (`auth/settings.py`)
+Central configuration loaded from environment:
+
+```python
+- require_auth: bool
+- admin_username: str
+- admin_password: str (hashed)
+- secret_key: str (session encryption)
+```
+
+### User Model
+
+```python
+- username: str (normalized lowercase)
+- password_hash: str (bcrypt)
+- role: str ('admin' or 'user')
+- feed_allowance: int (number of feeds allowed)
+- discord_id: str (optional SSO)
+- manual_feed_allowance: int (admin override)
+```
+
+### Roles
+
+**Admin:**
+- Full system access
+- Manage all feeds and posts
+- User management
+- Configuration access
+- Billing administration
+
+**User:**
+- Access whitelisted posts only
+- Limited feed allowance
+- Personal feed subscriptions
+
+## Session Management
+
+- Flask sessions with server-side storage
+- Cookie-based authentication
+- Configurable cookie settings:
+  - `SESSION_COOKIE_NAME`: Default "podly_session"
+  - `SESSION_COOKIE_HTTPONLY`: True (XSS protection)
+  - `SESSION_COOKIE_SAMESITE`: Lax (CSRF protection)
+  - `SESSION_COOKIE_SECURE`: False (allow HTTP for self-hosting)
+
+## Feed Access Tokens
+
+Since podcast players don't support cookie auth, Podly uses **feed access tokens**:
+
+### Token Structure
+```
+token_id: 32-char random string
+secret: 128-char random string
+format in URL: /feed/{token_id}:{secret}/rss
+```
+
+### Security Model
+- Token stored hashed in database
+- Secret acts as password
+- Can be revoked by user
+- Feed-specific or user-wide access
+- Optional expiration (not implemented)
+
+### Usage
+```bash
+# Generate token (web UI)
+# Use in podcast player:
+https://podly.example.com/feed/abc123:secret456/rss
+```
+
+## Discord SSO
+
+Optional Discord OAuth integration:
+
+**Configuration:**
+- `DISCORD_CLIENT_ID`
+- `DISCORD_CLIENT_SECRET`
+- `DISCORD_REDIRECT_URI`
+- `DISCORD_GUILD_IDS` (restrict to specific servers)
+
+**Flow:**
+1. User clicks "Login with Discord"
+2. Redirect to Discord OAuth
+3. Discord redirects back with code
+4. Podly exchanges code for user info
+5. Creates/links user account
+6. Redirects to app
+
+## Authentication Flows
+
+### Login (Traditional)
+```
+POST /api/auth/login
+{username: "user", password: "pass"}
+→ Sets session cookie
+→ Returns user info
+```
+
+### Login (Discord)
+```
+GET /api/discord/login
+→ Redirect to Discord
+→ GET /api/discord/callback
+→ Sets session cookie
+```
+
+### Feed Access
+```
+GET /feed/TOKEN_ID:SECRET/rss
+→ Validates token hash
+→ Returns ad-free RSS
+→ Updates last_used_at
+```
+
+## Rate Limiting
+
+Authentication endpoints have rate limiting:
+
+```python
+# From auth/rate_limiter.py
+- Login attempts: 5 per minute per IP
+- Registration: 3 per hour per IP
+- Password reset: 3 per hour per IP
+```
+
+Implements token bucket algorithm with Redis fallback to memory.
+
+## Bootstrap Process
+
+On first startup with auth enabled:
+1. Check if admin user exists
+2. Create admin from env vars if not
+3. Set password from `PODLY_ADMIN_PASSWORD`
+4. Log bootstrap event
+
+## Guards & Decorators
+
+### Route Protection
+```python
+from app.auth import require_admin
+
+@require_admin
+def admin_route():
+    # Only admins can access
+    pass
+```
+
+### Feed Access Check
+```python
+def is_feed_active_for_user(feed_id, user):
+    # Check if feed within user's allowance
+    # Based on subscription date ordering
+```
+
+## Security Considerations
+
+- Passwords hashed with bcrypt
+- Session secret key rotation support
+- HTTPS recommended but HTTP allowed for self-hosting
+- Feed tokens provide limited scope access
+- Rate limiting prevents brute force
+- No JWT (server-side sessions only)
+
+## Configuration
+
+**Environment Variables:**
+```bash
+REQUIRE_AUTH=true
+PODLY_ADMIN_USERNAME=admin
+PODLY_ADMIN_PASSWORD=secure_password
+PODLY_SECRET_KEY=random_64_char_string
+
+# Discord (optional)
+DISCORD_CLIENT_ID=...
+DISCORD_CLIENT_SECRET=...
+DISCORD_REDIRECT_URI=https://example.com/api/discord/callback
+DISCORD_GUILD_IDS=123456,789012
+```
+
+**Web UI Configuration:**
+- Enable/disable auth (requires restart)
+- Add/remove users
+- Manage feed tokens
+- View access logs
