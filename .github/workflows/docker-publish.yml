@@ -80,8 +80,6 @@ jobs:
             gpu_nvidia: "false"
             gpu_amd: "true"
             lite_build: "false"
-    env:
-      ARCH: amd64
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -119,7 +117,10 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
-            type=semver,pattern={{version}},suffix=-${{ matrix.variant.name }}-${{ env.ARCH }}
+            type=semver,pattern={{version}},suffix=-${{ matrix.variant.name }}
+            type=semver,pattern={{version}},enable=${{ matrix.variant.name == 'latest' }}
+            type=raw,value=${{ matrix.variant.name }},enable=true
+            type=raw,value=latest,enable=${{ matrix.variant.name == 'latest' }}
 
       - name: Build and push
         uses: docker/build-push-action@v5
@@ -127,7 +128,7 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          platforms: linux/${{ env.ARCH }}
+          platforms: linux/amd64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
