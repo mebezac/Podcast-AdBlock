@@ -8,6 +8,9 @@ on:
     branches:
       - main
 
+permissions:
+  contents: write
+
 jobs:
   lint-format-test:
     runs-on: ubuntu-latest
@@ -51,6 +54,13 @@ jobs:
 
       - name: Install dependencies
         run: pipenv install --dev
+
+      - name: Commit updated Pipfile.lock
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add Pipfile.lock
+          git diff --staged --quiet || (git commit -m "Update Pipfile.lock" && git push)
 
       - name: Install dependencies for mypy
         run: pipenv run mypy . --install-types --non-interactive --explicit-package-bases --exclude 'migrations' --exclude 'build' --exclude 'scripts' --exclude 'src/tests' --exclude 'src/tests/test_routes.py' --exclude 'src/app/routes.py'
