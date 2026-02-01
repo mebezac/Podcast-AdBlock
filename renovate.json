@@ -39,10 +39,12 @@
     }
   ],
   "pipenv": {
-    "enabled": true
+    "enabled": true,
+    "managerFilePatterns": ["/(^|/)Pipfile$/"]
   },
   "npm": {
-    "enabled": true
+    "enabled": true,
+    "managerFilePatterns": ["/(^|/)package\.json$/"]
   },
   "vulnerabilityAlerts": {
     "enabled": true,
