@@ -1,0 +1,54 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":dependencyDashboard"
+  ],
+  "labels": ["dependencies"],
+  "schedule": ["before 5am on Monday"],
+  "packageRules": [
+    {
+      "matchUpdateTypes": ["minor", "patch"],
+      "automerge": true,
+      "automergeType": "branch",
+      "minimumReleaseAge": "3 days"
+    },
+    {
+      "matchDepTypes": ["devDependencies"],
+      "matchUpdateTypes": ["major"],
+      "dependencyDashboardApproval": true
+    },
+    {
+      "matchManagers": ["pipenv"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "automerge": true,
+      "automergeType": "branch"
+    },
+    {
+      "matchManagers": ["npm"],
+      "matchPackageNames": ["react", "react-dom"],
+      "groupName": "react monorepo"
+    },
+    {
+      "matchPackageNames": ["@tanstack/react-query"],
+      "groupName": "tanstack packages"
+    },
+    {
+      "matchPackageNames": ["eslint", "@eslint/js", "typescript-eslint", "eslint-plugin-react-hooks", "eslint-plugin-react-refresh"],
+      "groupName": "eslint packages"
+    }
+  ],
+  "pipenv": {
+    "enabled": true
+  },
+  "npm": {
+    "enabled": true
+  },
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "labels": ["security"],
+    "schedule": ["at any time"]
+  },
+  "prConcurrentLimit": 5,
+  "prHourlyLimit": 2
+}
