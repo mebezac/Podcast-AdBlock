@@ -181,6 +181,16 @@ export const feedsApi = {
     return response.data;
   },
 
+  clearAdDetection: async (guid: string): Promise<{ status: string; message: string; details?: Record<string, unknown> }> => {
+    const response = await api.post(`/api/posts/${guid}/clear-ads`);
+    return response.data;
+  },
+
+  clearAudioProcessing: async (guid: string): Promise<{ status: string; message: string; details?: Record<string, unknown> }> => {
+    const response = await api.post(`/api/posts/${guid}/clear-audio`);
+    return response.data;
+  },
+
   getPostStatus: async (guid: string): Promise<{
     status: string;
     step: number;
