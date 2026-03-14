@@ -36,7 +36,7 @@ pytest-cov = "==7.0.0"
 flask-cors = "==6.0.2"
 bcrypt = "==5.0.0"
 httpx-aiohttp = "==0.1.12"
-stripe = "==14.0.1"
+stripe = "==14.4.1"
 
 [dev-packages]
 black = "==25.12.0"
