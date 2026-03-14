@@ -39,7 +39,7 @@ httpx-aiohttp = "==0.1.12"
 stripe = "==14.0.1"
 
 [dev-packages]
-black = "==25.12.0"
+black = "==26.3.1"
 mypy = "==1.19.0"
 types-pyyaml = "==6.0.12.20250915"
 types-requests = "==2.32.4.20250913"
