@@ -30,7 +30,7 @@ ffmpeg-python = "==0.2.0"
 litellm = "==1.80.9"  # Pin to avoid fastuuid dependency
 bleach = "==6.3.0"
 types-bleach = "==6.3.0.20251115"
-groq = "==0.37.1"
+groq = "==1.2.0"
 async_timeout = "==5.0.1"
 pytest-cov = "==7.0.0"
 flask-cors = "==6.0.2"
