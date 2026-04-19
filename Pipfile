@@ -27,7 +27,7 @@ flask-sqlalchemy = "==3.1.1"
 flask-migrate = "==4.1.0"
 Flask-APScheduler = "==1.13.1"
 ffmpeg-python = "==0.2.0"
-litellm = "==1.80.9"  # Pin to avoid fastuuid dependency
+litellm = "==1.83.8"  # Pin to avoid fastuuid dependency
 bleach = "==6.3.0"
 types-bleach = "==6.3.0.20251115"
 groq = "==0.37.1"
